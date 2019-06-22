@@ -18,6 +18,12 @@ import {
   addWhitelistedUIProps,
 } from './ConfigHelper';
 import backwardCompatibleAnimWrapper from './animations/backwardCompatibleAnimWrapper';
+import {
+  Transition,
+  Transitioning,
+  createTransitioningComponent,
+} from './Transitioning';
+import SpringUtils from './animations/SpringUtils';
 
 const Animated = {
   // components
@@ -26,6 +32,7 @@ const Animated = {
   Image: createAnimatedComponent(Image),
   ScrollView: createAnimatedComponent(ScrollView),
   Code: AnimatedCode,
+  createAnimatedComponent,
 
   // classes
   Clock: AnimatedClock,
@@ -40,6 +47,7 @@ const Animated = {
   decay: backwardCompatibleAnimWrapper(decay, DecayAnimation),
   timing: backwardCompatibleAnimWrapper(timing, TimingAnimation),
   spring: backwardCompatibleAnimWrapper(spring, SpringAnimation),
+  SpringUtils,
 
   // configuration
   addWhitelistedNativeProps,
@@ -48,4 +56,4 @@ const Animated = {
 
 export default Animated;
 
-export { Easing };
+export { Easing, Transitioning, Transition, createTransitioningComponent };

@@ -429,14 +429,15 @@ class Interactable extends Component {
           cond(dt, dragBehaviors[axis]),
         ],
         [
+          cond(clockRunning(clock), 0, startClock(clock)),
           cond(dragging, [updateSnapTo, set(dragging, 0)]),
           cond(dt, snapBehaviors[axis]),
           testMovementFrames,
           stopWhenNeeded,
         ]
       );
-      const wrapStep = props.enabled
-        ? cond(props.enabled, step, [set(dragging, 1), stopClock(clock)])
+      const wrapStep = props.dragEnabled
+        ? cond(props.dragEnabled, step, [set(dragging, 1), stopClock(clock)])
         : step;
 
       // export some values to be available for imperative commands
