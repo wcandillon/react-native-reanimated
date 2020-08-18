@@ -93,7 +93,7 @@ function AnimatedScrollHandlerTest() {
 // useAnimatedGestureHandler
 function AnimatedGestureHandlerTest() {
   const x = useSharedValue(0);
-  const gestureHandler = useAnimatedGestureHandler({
+  const gestureHandler = useAnimatedGestureHandler<{ startX: number }>({
     onStart: (_, ctx) => {
       ctx.startX = x.value;
     },
@@ -146,7 +146,7 @@ function WithTimingTest() {
 // withSpring
 function WithSpringTest() {
   const x = useSharedValue(0);
-  const gestureHandler = useAnimatedGestureHandler({
+  const gestureHandler = useAnimatedGestureHandler<{ startX: number }>({
     onStart: (_, ctx) => {
       ctx.startX = x.value;
     },
@@ -176,7 +176,7 @@ function WithSpringTest() {
 // cancelAnimation
 function CancelAnimationTest() {
   const x = useSharedValue(0);
-  const gestureHandler = useAnimatedGestureHandler({
+  const gestureHandler = useAnimatedGestureHandler<{ startX: number }>({
     onStart: (_, ctx) => {
       cancelAnimation(x);
     },
@@ -206,7 +206,7 @@ function CancelAnimationTest() {
 // delay
 function DelayTest() {
   const x = useSharedValue(0);
-  const gestureHandler = useAnimatedGestureHandler({
+  const gestureHandler = useAnimatedGestureHandler<{ startX: number }>({
     onStart: (_, ctx) => {
       cancelAnimation(x);
     },
@@ -236,7 +236,7 @@ function DelayTest() {
 // repeat
 function RepeatTest() {
   const x = useSharedValue(0);
-  const gestureHandler = useAnimatedGestureHandler({
+  const gestureHandler = useAnimatedGestureHandler<{ startX: number }>({
     onStart: (_, ctx) => {
       cancelAnimation(x);
     },
@@ -266,7 +266,7 @@ function RepeatTest() {
 // sequence
 function SequenceTest() {
   const x = useSharedValue(0);
-  const gestureHandler = useAnimatedGestureHandler({
+  const gestureHandler = useAnimatedGestureHandler<{ startX: number }>({
     onStart: (_, ctx) => {
       cancelAnimation(x);
     },
@@ -297,7 +297,7 @@ function SequenceTest() {
 function WithDecayTest() {
   const x = useSharedValue(0);
 
-  const gestureHandler = useAnimatedGestureHandler({
+  const gestureHandler = useAnimatedGestureHandler<{ startX: number }>({
     onStart: (_, ctx) => {
       ctx.startX = x.value;
     },
