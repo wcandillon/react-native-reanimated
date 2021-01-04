@@ -235,9 +235,9 @@ declare module 'react-native-reanimated' {
       getNode(): ReactNativeScrollView;
     }
     export class Code extends Component<CodeProps> {}
-    export function createAnimatedComponent<C extends ComponentClass, S extends object>(
-      component: C
-    ): ComponentType<AnimateProps<ComponentProps<C>>>;
+    export function createAnimatedComponent<P>(
+      component: ComponentClass<P>
+    ): ComponentType<AnimateProps<P>>;
   
     // classes
     export {

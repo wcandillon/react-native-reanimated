@@ -1,6 +1,6 @@
 /* eslint-disable */
 import React, { useState } from 'react';
-import { StyleSheet, Button, View, ViewStyle } from 'react-native';
+import { StyleSheet, Button, View, Image } from 'react-native';
 import {
   PanGestureHandler,
   PinchGestureHandlerGestureEvent,
@@ -42,6 +42,7 @@ class Path extends React.Component<{ fill?: string }> {
 }
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
+const AnimatedImage = Animated.createAnimatedComponent(Image);
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
 function CreateAnimatedComponentTest1() {
@@ -79,6 +80,7 @@ function CreateAnimatedFlatList() {
         data={[]}
         renderItem={() => null}
       />
+      <AnimatedImage style={{ flex: 1 }} source={{ uri: "" }} />
     </>
   )
 }
