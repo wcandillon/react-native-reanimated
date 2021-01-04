@@ -43,7 +43,6 @@ class Path extends React.Component<{ fill?: string }> {
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
-const AnimatedFlatList2 = Animated.createAnimatedComponent<typeof FlatList, ViewStyle>(FlatList);
 
 function CreateAnimatedComponentTest1() {
   const animatedProps = useAnimatedProps(() => ({ fill: 'blue' }));
@@ -74,7 +73,7 @@ function CreateAnimatedFlatList() {
         data={[]}
         renderItem={() => null}
       />
-      <AnimatedFlatList2
+      <AnimatedFlatList
         // @ts-expect-error
         style={{ flex: 1, red: false }}
         data={[]}
