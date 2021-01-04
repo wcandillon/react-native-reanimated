@@ -2,7 +2,7 @@
 // TypeScript Version: 2.8
 
 declare module 'react-native-reanimated' {
-  import { ComponentClass, ReactNode, Component, RefObject, ComponentType } from 'react';
+  import { ComponentClass, ReactNode, Component, RefObject, ComponentType, ComponentProps } from 'react';
   import {
     ViewProps,
     TextProps,
@@ -214,7 +214,7 @@ declare module 'react-native-reanimated' {
       [K in keyof P]: K extends 'style'
         ? StyleProp<AnimateStyle<S>>
         : P[K] | AnimatedNode<P[K]>;
-    };
+    } & { animatedProps?: AnimateProps<S, P> };
 
     type CodeProps = {
       exec?: AnimatedNode<number>;
@@ -238,8 +238,10 @@ declare module 'react-native-reanimated' {
       getNode(): ReactNativeScrollView;
     }
     export class Code extends Component<CodeProps> {}
-    export function createAnimatedComponent<S extends object, P extends { style?: StyleProp<S>; }>(component: ComponentType<P>): ComponentType<AnimateProps<S, P>>;
-
+    export function createAnimatedComponent<C extends ComponentClass, S extends object>(
+      component: C
+    ): ComponentType<AnimateProps<S, ComponentProps<C>>>;
+  
     // classes
     export {
       AnimatedClock as Clock,
