@@ -1,6 +1,6 @@
 /* eslint-disable */
 import React, { useState } from 'react';
-import { StyleSheet, Button, View, Image, ImageStyle } from 'react-native';
+import { StyleSheet, Button, View, ViewStyle, StyleProp } from 'react-native';
 import {
   PanGestureHandler,
   PinchGestureHandlerGestureEvent,
@@ -42,8 +42,8 @@ class Path extends React.Component<{ fill?: string }> {
 }
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
-const AnimatedImage = Animated.createAnimatedComponent(Image);
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
+const AnimatedFlatList2 = Animated.createAnimatedComponent<typeof FlatList, ViewStyle>(FlatList);
 
 function CreateAnimatedComponentTest1() {
   const animatedProps = useAnimatedProps(() => ({ fill: 'blue' }));
@@ -68,12 +68,21 @@ function CreateAnimatedComponentTest3() {
 
 function CreateAnimatedFlatList() {
   return (
-    <AnimatedFlatList
-      style={{ flex: 1}}
-    />
+    <>
+      <AnimatedFlatList
+        style={{ flex: 1, red: false }}
+        data={[]}
+        renderItem={() => null}
+      />
+      <AnimatedFlatList2
+        // @ts-expect-error
+        style={{ flex: 1, red: false }}
+        data={[]}
+        renderItem={() => null}
+      />
+    </>
   )
 }
-
 
 
 const styles = StyleSheet.create({
