@@ -31,7 +31,38 @@ import Animated, {
   useValue,
   color,
   interpolateColors,
+  useAnimatedProps,
 } from 'react-native-reanimated';
+
+class Path extends React.Component<{ fill?: string }> {
+  render() {
+    return null;
+  }
+}
+
+const AnimatedPath = Animated.createAnimatedComponent(Path);
+
+function CreateAnimatedComponentTest1() {
+  const animatedProps = useAnimatedProps(() => ({ fill: 'blue' }));
+  return (
+    <AnimatedPath animatedProps={animatedProps} />
+  )
+}
+
+function CreateAnimatedComponentTest2() {
+  const animatedProps = useAnimatedProps(() => ({ fill2: 'blue' }));
+  return (
+    // @ts-expect-error
+    <AnimatedPath animatedProps={animatedProps} />
+  )
+}
+
+function CreateAnimatedComponentTest3() {
+  return (
+    <AnimatedPath />
+  )
+}
+
 
 const styles = StyleSheet.create({
   container: {
