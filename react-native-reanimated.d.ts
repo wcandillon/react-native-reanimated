@@ -188,7 +188,7 @@ declare module 'react-native-reanimated' {
     };
     export type AnimatedTransform = (AdaptTransforms<TransformStyleTypes>)[];
 
-    export type AnimateStyle<S extends object> = {
+    export type AnimateStyle<S> = {
       [K in keyof S]: K extends 'transform'
         ? AnimatedTransform
         : (S[K] extends ReadonlyArray<any>
@@ -206,15 +206,12 @@ declare module 'react-native-reanimated' {
     };
 
     export type AnimateProps<
-      S extends object,
-      P extends {
-        style?: StyleProp<S>;
-      }
+      P extends object
     > = {
       [K in keyof P]: K extends 'style'
-        ? StyleProp<AnimateStyle<S>>
+        ? StyleProp<AnimateStyle<P[K]>>
         : P[K] | AnimatedNode<P[K]>;
-    } & { animatedProps?: AnimateProps<S, P> };
+    } & { animatedProps?: AnimateProps<P> };
 
     type CodeProps = {
       exec?: AnimatedNode<number>;
@@ -223,24 +220,24 @@ declare module 'react-native-reanimated' {
     };
 
     // components
-    export class View extends Component<AnimateProps<ViewStyle, ViewProps>> {
+    export class View extends Component<AnimateProps<ViewProps>> {
       getNode(): ReactNativeView;
     }
-    export class Text extends Component<AnimateProps<TextStyle, TextProps>> {
+    export class Text extends Component<AnimateProps<TextProps>> {
       getNode(): ReactNativeText;
     }
-    export class Image extends Component<AnimateProps<ImageStyle, ImageProps>> {
+    export class Image extends Component<AnimateProps<ImageProps>> {
       getNode(): ReactNativeImage;
     }
     export class ScrollView extends Component<
-      AnimateProps<ViewStyle, ScrollViewProps>
+      AnimateProps<ScrollViewProps>
     > {
       getNode(): ReactNativeScrollView;
     }
     export class Code extends Component<CodeProps> {}
     export function createAnimatedComponent<C extends ComponentClass, S extends object>(
       component: C
-    ): ComponentType<AnimateProps<S, ComponentProps<C>>>;
+    ): ComponentType<AnimateProps<ComponentProps<C>>>;
   
     // classes
     export {

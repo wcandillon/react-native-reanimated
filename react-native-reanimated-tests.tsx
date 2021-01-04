@@ -1,6 +1,6 @@
 /* eslint-disable */
 import React, { useState } from 'react';
-import { StyleSheet, Button, View, ViewStyle, StyleProp } from 'react-native';
+import { StyleSheet, Button, View, ViewStyle } from 'react-native';
 import {
   PanGestureHandler,
   PinchGestureHandlerGestureEvent,
@@ -70,7 +70,7 @@ function CreateAnimatedFlatList() {
   return (
     <>
       <AnimatedFlatList
-        style={{ flex: 1, red: false }}
+        style={{ flex: 1 }}
         data={[]}
         renderItem={() => null}
       />
