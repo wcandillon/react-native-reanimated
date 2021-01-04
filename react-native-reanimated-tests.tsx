@@ -1,11 +1,12 @@
 /* eslint-disable */
 import React, { useState } from 'react';
-import { StyleSheet, Button, View } from 'react-native';
+import { StyleSheet, Button, View, Image, ImageStyle } from 'react-native';
 import {
   PanGestureHandler,
   PinchGestureHandlerGestureEvent,
   PinchGestureHandler,
   PanGestureHandlerGestureEvent,
+  FlatList,
 } from 'react-native-gesture-handler';
 import Animated, {
   useSharedValue,
@@ -41,6 +42,8 @@ class Path extends React.Component<{ fill?: string }> {
 }
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
+const AnimatedImage = Animated.createAnimatedComponent(Image);
+const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
 function CreateAnimatedComponentTest1() {
   const animatedProps = useAnimatedProps(() => ({ fill: 'blue' }));
@@ -62,6 +65,15 @@ function CreateAnimatedComponentTest3() {
     <AnimatedPath />
   )
 }
+
+function CreateAnimatedFlatList() {
+  return (
+    <AnimatedFlatList
+      style={{ flex: 1}}
+    />
+  )
+}
+
 
 
 const styles = StyleSheet.create({
