@@ -353,11 +353,11 @@ function CancelAnimationTest() {
 // withDelay
 function WithDelayTest() {
   const x = useSharedValue(0);
-  const gestureHandler = useAnimatedGestureHandler({
+  const gestureHandler = useAnimatedGestureHandler<PanGestureHandlerGestureEvent, { startX: number }>({
     onStart: (_, _ctx) => {
       cancelAnimation(x);
     },
-    onActive: (event, ctx: { startX: number }) => {
+    onActive: (event, ctx) => {
       x.value = ctx.startX + event.translationX;
     },
     onEnd: (_) => {
@@ -383,11 +383,11 @@ function WithDelayTest() {
 // withRepeat
 function WithRepeatTest() {
   const x = useSharedValue(0);
-  const gestureHandler = useAnimatedGestureHandler({
+  const gestureHandler = useAnimatedGestureHandler<PanGestureHandlerGestureEvent, { startX: number }>({
     onStart: (_, _ctx) => {
       cancelAnimation(x);
     },
-    onActive: (event, ctx: { startX: number }) => {
+    onActive: (event, ctx) => {
       x.value = ctx.startX + event.translationX;
     },
     onEnd: (_) => {
@@ -413,11 +413,11 @@ function WithRepeatTest() {
 // withSequence
 function WithSequenceTest() {
   const x = useSharedValue(0);
-  const gestureHandler = useAnimatedGestureHandler({
+  const gestureHandler = useAnimatedGestureHandler<PanGestureHandlerGestureEvent, { startX: number }>({
     onStart: (_, _ctx) => {
       cancelAnimation(x);
     },
-    onActive: (event, ctx: { startX: number }) => {
+    onActive: (event, ctx) => {
       x.value = ctx.startX + event.translationX;
     },
     onEnd: (_) => {
