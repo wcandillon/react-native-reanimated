@@ -292,6 +292,26 @@ function WithTimingTest() {
   );
 }
 
+function WithTimingToValueAsColorTest() {
+  const style = useAnimatedStyle(() => {
+    return {
+      width: withTiming(
+        'rgba(255,105,180,0)',
+        {
+          duration: 500,
+          easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+        },
+        (_finished) => {}
+      ),
+    };
+  });
+  return (
+    <View>
+      <Animated.View style={[styles.box, style]} />
+    </View>
+  );
+}
+
 // withSpring
 function WithSpringTest() {
   const x = useSharedValue(0);
@@ -319,6 +339,19 @@ function WithSpringTest() {
     <PanGestureHandler onGestureEvent={gestureHandler}>
       <Animated.View style={[styles.box, animatedStyle]} />
     </PanGestureHandler>
+  );
+}
+
+function WithSpringToValueAsColorTest() {
+  const style = useAnimatedStyle(() => {
+    return {
+      width: withSpring('rgba(255,105,180,0)', {}, (_finished) => {}),
+    };
+  });
+  return (
+    <View>
+      <Animated.View style={[styles.box, style]} />
+    </View>
   );
 }
 
@@ -355,7 +388,10 @@ function CancelAnimationTest() {
 // withDelay
 function WithDelayTest() {
   const x = useSharedValue(0);
-  const gestureHandler = useAnimatedGestureHandler<PanGestureHandlerGestureEvent, { startX: number }>({
+  const gestureHandler = useAnimatedGestureHandler<
+    PanGestureHandlerGestureEvent,
+    { startX: number }
+  >({
     onStart: (_, _ctx) => {
       cancelAnimation(x);
     },
@@ -385,7 +421,10 @@ function WithDelayTest() {
 // withRepeat
 function WithRepeatTest() {
   const x = useSharedValue(0);
-  const gestureHandler = useAnimatedGestureHandler<PanGestureHandlerGestureEvent, { startX: number }>({
+  const gestureHandler = useAnimatedGestureHandler<
+    PanGestureHandlerGestureEvent,
+    { startX: number }
+  >({
     onStart: (_, _ctx) => {
       cancelAnimation(x);
     },
@@ -415,7 +454,10 @@ function WithRepeatTest() {
 // withSequence
 function WithSequenceTest() {
   const x = useSharedValue(0);
-  const gestureHandler = useAnimatedGestureHandler<PanGestureHandlerGestureEvent, { startX: number }>({
+  const gestureHandler = useAnimatedGestureHandler<
+    PanGestureHandlerGestureEvent,
+    { startX: number }
+  >({
     onStart: (_, _ctx) => {
       cancelAnimation(x);
     },
