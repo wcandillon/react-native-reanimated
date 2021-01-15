@@ -11,7 +11,7 @@ import {
   getTimestamp,
 } from './core';
 import updateProps from './UpdateProps';
-import { initialUpdaterRun } from './animations';
+import { initialUpdaterRun, cancelAnimation } from './animations';
 import { getTag } from './NativeMethods';
 import NativeReanimated from './NativeReanimated';
 import { Platform } from 'react-native';
@@ -27,6 +27,12 @@ export function useSharedValue(init, shouldRebuild = true) {
     ref.current.last = init;
     ref.current.mutable.value = init;
   }
+
+  useEffect(() => {
+    return () => {
+      cancelAnimation(ref.current.mutable);
+    };
+  }, []);
 
   return ref.current.mutable;
 }
@@ -71,10 +77,10 @@ function prepareAnimation(animatedProp, lastAnimation, lastValue) {
             // previously it was a shared value
             value = lastValue.value;
           } else if (lastValue.onFrame !== undefined) {
-            if (lastAnimation?.current) {
+            if (lastAnimation?.current !== undefined) {
               // it was an animation before, copy its state
               value = lastAnimation.current;
-            } else if (lastValue?.current) {
+            } else if (lastValue?.current !== undefined) {
               // it was initialized
               value = lastValue.current;
             }
@@ -104,28 +110,36 @@ function prepareAnimation(animatedProp, lastAnimation, lastValue) {
   return prepareAnimation(animatedProp, lastAnimation, lastValue);
 }
 
-function runAnimations(animation, timestamp, key, result) {
+function runAnimations(animation, timestamp, key, result, animationsActive) {
   'worklet';
-  function runAnimations(animation, timestamp, key, result) {
+  function runAnimations(animation, timestamp, key, result, animationsActive) {
+    if (!animationsActive.value) {
+      return true;
+    }
     if (Array.isArray(animation)) {
       result[key] = [];
       let allFinished = true;
       animation.forEach((entry, index) => {
-        if (!runAnimations(entry, timestamp, index, result[key])) {
+        if (
+          !runAnimations(entry, timestamp, index, result[key], animationsActive)
+        ) {
           allFinished = false;
         }
       });
       return allFinished;
     } else if (typeof animation === 'object' && animation.onFrame) {
-      if (animation.callStart) {
-        animation.callStart(timestamp);
-        animation.callStart = null;
-      }
-      const finished = animation.onFrame(animation, timestamp);
-      animation.timestamp = timestamp;
-      if (finished) {
-        animation.finished = true;
-        animation.callback && animation.callback(true /* finished */);
+      let finished = true;
+      if (!animation.finished) {
+        if (animation.callStart) {
+          animation.callStart(timestamp);
+          animation.callStart = null;
+        }
+        finished = animation.onFrame(animation, timestamp);
+        animation.timestamp = timestamp;
+        if (finished) {
+          animation.finished = true;
+          animation.callback && animation.callback(true /* finished */);
+        }
       }
       result[key] = animation.current;
       return finished;
@@ -133,7 +147,15 @@ function runAnimations(animation, timestamp, key, result) {
       result[key] = {};
       let allFinished = true;
       Object.keys(animation).forEach((k) => {
-        if (!runAnimations(animation[k], timestamp, k, result[key])) {
+        if (
+          !runAnimations(
+            animation[k],
+            timestamp,
+            k,
+            result[key],
+            animationsActive
+          )
+        ) {
           allFinished = false;
         }
       });
@@ -143,7 +165,7 @@ function runAnimations(animation, timestamp, key, result) {
       return true;
     }
   }
-  return runAnimations(animation, timestamp, key, result);
+  return runAnimations(animation, timestamp, key, result, animationsActive);
 }
 
 // TODO: recirsive worklets aren't supported yet
@@ -191,7 +213,14 @@ function styleDiff(oldStyle, newStyle) {
   return diff;
 }
 
-function styleUpdater(viewDescriptor, updater, state, maybeViewRef) {
+function styleUpdater(
+  viewDescriptor,
+  updater,
+  state,
+  maybeViewRef,
+  adapters,
+  animationsActive
+) {
   'worklet';
   const animations = state.animations || {};
   const newValues = updater() || {};
@@ -228,7 +257,8 @@ function styleUpdater(viewDescriptor, updater, state, maybeViewRef) {
         animations[propName],
         timestamp,
         propName,
-        updates
+        updates,
+        animationsActive
       );
       if (finished) {
         last[propName] = updates[propName];
@@ -239,7 +269,7 @@ function styleUpdater(viewDescriptor, updater, state, maybeViewRef) {
     });
 
     if (Object.keys(updates).length) {
-      updateProps(viewDescriptor, updates, maybeViewRef);
+      updateProps(viewDescriptor, updates, maybeViewRef, adapters);
     }
 
     if (!allFinished) {
@@ -270,22 +300,26 @@ function styleUpdater(viewDescriptor, updater, state, maybeViewRef) {
   state.last = Object.assign({}, oldValues, newValues);
 
   if (Object.keys(diff).length !== 0) {
-    updateProps(viewDescriptor, diff, maybeViewRef);
+    updateProps(viewDescriptor, diff, maybeViewRef, adapters);
   }
 }
 
-export function useAnimatedStyle(updater, dependencies) {
+export function useAnimatedStyle(updater, dependencies, adapters) {
   const viewDescriptor = useSharedValue({ tag: -1, name: null }, false);
   const initRef = useRef(null);
   const inputs = Object.values(updater._closure);
   const viewRef = useRef(null);
+  adapters = !adapters || Array.isArray(adapters) ? adapters : [adapters];
+  const adaptersHash = adapters ? buildWorkletsHash(adapters) : null;
+  const animationsActive = useSharedValue(true);
 
   // build dependencies
-  if (dependencies === undefined) {
+  if (!dependencies) {
     dependencies = [...inputs, updater.__workletHash];
   } else {
     dependencies.push(updater.__workletHash);
   }
+  adaptersHash && dependencies.push(adaptersHash);
 
   if (initRef.current === null) {
     const initial = initialUpdaterRun(updater);
@@ -301,7 +335,14 @@ export function useAnimatedStyle(updater, dependencies) {
   useEffect(() => {
     const fun = () => {
       'worklet';
-      styleUpdater(viewDescriptor, updater, remoteState, maybeViewRef);
+      styleUpdater(
+        viewDescriptor,
+        updater,
+        remoteState,
+        maybeViewRef,
+        adapters,
+        animationsActive
+      );
     };
     const mapperId = startMapper(fun, inputs, []);
     return () => {
@@ -313,6 +354,7 @@ export function useAnimatedStyle(updater, dependencies) {
     return () => {
       initRef.current = null;
       viewRef.current = null;
+      animationsActive.value = false;
     };
   }, []);
 
@@ -393,7 +435,7 @@ function buildWorkletsHash(handlers) {
 
 // builds dependencies array for gesture handlers
 function buildDependencies(dependencies, handlers) {
-  if (dependencies === undefined) {
+  if (!dependencies) {
     dependencies = Object.keys(handlers).map((handlerKey) => {
       const handler = handlers[handlerKey];
       return {
@@ -417,10 +459,15 @@ function areDependenciesEqual(nextDeps, prevDeps) {
   var objectIs = typeof Object.is === 'function' ? Object.is : is;
 
   function areHookInputsEqual(nextDeps, prevDeps) {
-    if (prevDeps === null) return !1;
-    for (var i = 0; i < prevDeps.length && i < nextDeps.length; i++)
-      if (!objectIs(nextDeps[i], prevDeps[i])) return !1;
-    return !0;
+    if (!nextDeps || !prevDeps || prevDeps.length !== nextDeps.length) {
+      return false;
+    }
+    for (let i = 0; i < prevDeps.length; ++i) {
+      if (!objectIs(nextDeps[i], prevDeps[i])) {
+        return false;
+      }
+    }
+    return true;
   }
 
   return areHookInputsEqual(nextDeps, prevDeps);
