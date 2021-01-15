@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useState } from 'react';
+import React, { useState, FC, Component } from 'react';
 import { StyleSheet, Button, View, Image } from 'react-native';
 import {
   PanGestureHandler,
@@ -35,6 +35,31 @@ import Animated, {
   createAnimatedPropAdapter,
   useAnimatedProps,
 } from 'react-native-reanimated';
+
+
+interface MyCompProps {
+  color: string;
+}
+
+class MyComp extends Component<MyCompProps> {
+  render() {
+    return null;
+  }
+}
+
+const MyAnimatedComp = Animated.createAnimatedComponent(MyComp);
+
+function Test1() {
+  const animatedProps = useAnimatedProps(() => ({
+    color: 'blue'
+  }));
+  return (<MyAnimatedComp animatedProps={animatedProps} />)
+}
+
+function Test2() {
+  const animatedProps = useAnimatedProps(() => ({}));
+  return (<MyAnimatedComp color="blue" animatedProps={animatedProps} />)
+}
 
 class Path extends React.Component<{ fill?: string }> {
   render() {
