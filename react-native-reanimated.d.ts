@@ -241,7 +241,7 @@ declare module 'react-native-reanimated' {
     export class Code extends Component<CodeProps> {}
     export function createAnimatedComponent<P>(
       component: ComponentClass<P>
-    ): ComponentType<AnimateProps<P>>;
+    ): ComponentType<AnimateProps<Partial<P>>>;
   
     // classes
     export {
