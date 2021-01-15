@@ -1,6 +1,6 @@
 /* eslint-disable */
 import React, { useState, FC, Component } from 'react';
-import { StyleSheet, Button, View, Image, ViewProps } from 'react-native';
+import { StyleSheet, Button, View, Image } from 'react-native';
 import {
   PanGestureHandler,
   PinchGestureHandlerGestureEvent,
@@ -37,7 +37,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 
-interface MyCompProps extends ViewProps {
+interface MyCompProps {
   color: string;
 }
 
